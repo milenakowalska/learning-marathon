@@ -7,6 +7,7 @@ from django.utils.timezone import now
 class User(AbstractUser):
     first_name = models.CharField(max_length=20)
     now_learning = models.BooleanField(default=False)
+    udemy = models.BooleanField(default=False)
 
 
 
@@ -15,6 +16,7 @@ class LearningSession(models.Model):
     user = models.ForeignKey("User", on_delete=models.CASCADE, related_name='progress')
     start_date = models.DateTimeField(default=now)
     end_date = models.DateTimeField(default=now)
+    udemy = models.BooleanField(default=True)
 
     def duration(self):
         return self.end_date - self.start_date

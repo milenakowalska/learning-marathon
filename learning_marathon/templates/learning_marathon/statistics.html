@@ -37,8 +37,61 @@
         </div>
 
     </div>
+    {% if day.user1_no_udemy > 0 or day.user2_no_udemy > 0 %}
+    <div class='row align-content-center m-3' style='min-height:50px'>
+        <div class='col-lg-2'>
+            
+        </div>
+        {% if day.user1_no_udemy > 0 %}
+        <div class='col-lg-1'>
+            {{ day.user1_no_udemy }}       
+        </div>
+        <div class='col-lg-4'>
+            {% for reward in day.user1_no_udemy_rewards|get_range %}
+            <i style='height: 20px;font-size: 20px;' class="far fa-star"></i>
+            {% endfor %}   
+        </div>
+        {% endif %}
+        {% if day.user2_no_udemy > 0 %}
+        <div class='col-lg-4 text-right'>
+            {% for reward in day.user2_no_udemy_rewards|get_range %}
+            <i style='height: 20px;font-size: 20px;' class="far fa-star"></i>
+            {% endfor %}
+        </div>
+        <div class='col-lg-1 text-right'>
+            {{ day.user2_no_udemy }}
+        </div>
+        {% endif %}
+
+    </div>
+    {% endif %}
     <hr />
     {% endfor %}
+
+    <div class='row align-content-center m-3 bg-dark' style='color:whitesmoke;border-radius:10px;min-height:70px'>
+        <div class='col-lg-2'>
+            Summary: <i style='height: 20px;font-size: 30px;' class="fas fa-star"></i>
+        </div>
+        <div class='col-lg-5'>
+            <p id='name'>{{ user1_summary }}</p>
+        </div>
+        <div class='col-lg-5 text-right'>
+            <p id='name'>{{ user2_summary }}</p>
+        </div>
+    </div>
+
+    <div class='row align-content-center m-3 bg-dark' style='color:whitesmoke;border-radius:10px;min-height:70px'>
+        <div class='col-lg-2'>
+            No Udemy: <i style='height: 20px;font-size: 30px;' class="far fa-star"></i>
+        </div>
+        <div class='col-lg-5'>
+            <p id='name'>{{ user1_no_udemy_summary }}</p>
+        </div>
+        <div class='col-lg-5 text-right'>
+            <p id='name'>{{ user1_no_udemy_summary }}</p>
+        </div>
+    </div>
+
 </div>
 
 {% endblock %}
