@@ -21,14 +21,21 @@ def index(request):
     if not request.user.is_authenticated:
         return render(request, 'learning_marathon/login.html')
     if request.method == 'POST':
+ 
         if request.user.now_learning:
             current_session = LearningSession.objects.filter(user=request.user).last()
             current_session.end_date = datetime.datetime.now(tz=timezone('Europe/Warsaw'))
             current_session.save()
             request.user.now_learning = False
+            request.user.udemy = False
             request.user.save()
         else:
-            current_session = LearningSession.objects.create(user = request.user)
+            if 'udemy' in request.POST:
+                current_session = LearningSession.objects.create(user = request.user, udemy = True) 
+                current_session.start_date = datetime.datetime.now(tz=timezone('Europe/Warsaw'))
+                request.user.udemy = True
+            else:
+                current_session = LearningSession.objects.create(user = request.user, udemy = False) 
             current_session.save()
             request.user.now_learning = True
             request.user.save()
@@ -38,7 +45,7 @@ def index(request):
     current_learner = None
     users = User.objects.all()
     for user in users:
-        if user.now_learning and user.id != request.user.id:
+        if user.udemy and user.id != request.user.id:
             not_available = True
             current_learner = user
 
@@ -50,7 +57,23 @@ def statistics(request):
     data = make_statistics.get_data()
     data = data[1:]
     users = User.objects.all()
-    return render(request, 'learning_marathon/statistics.html', {'data':data, 'users':users})
+    user1_summary = datetime.timedelta(seconds=0)
+    user2_summary = datetime.timedelta(seconds=0)
+    user1_no_udemy_summary = datetime.timedelta(seconds=0)
+    user2_no_udemy_summary = datetime.timedelta(seconds=0)
+
+    for day in data:
+        user1_summary += day['user1']
+        user2_summary += day['user2']
+        user1_no_udemy_summary += day['user1_no_udemy']
+        user2_no_udemy_summary += day['user2_no_udemy']
+
+    return render(request, 'learning_marathon/statistics.html', {'data':data, 
+                                                                'users':users, 
+                                                                'user1_summary':user1_summary, 
+                                                                'user2_summary':user2_summary,
+                                                                'user1_no_udemy_summary':user1_no_udemy_summary, 
+                                                                'user2_no_udemy_summary':user2_no_udemy_summary})
 
 def login_view(request):
     if request.method == "POST":
