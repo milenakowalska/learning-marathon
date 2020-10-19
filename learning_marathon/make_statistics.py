@@ -15,7 +15,7 @@ def day_summary(user, date, udemy: bool):
             day_complete += entry.duration()
     summary = day_complete - datetime.timedelta(microseconds=day_complete.microseconds)
     if summary:
-        return summary 
+        return summary
     else:
         return datetime.timedelta(seconds=0)
 
@@ -50,7 +50,11 @@ def update():
     with open (os.path.join(os.path.dirname(__file__),'learning_sessions.json')) as json_file:
         data = json.load(json_file)
         last_update = data['learning_sessions'][-1]['day']
-        if ((datetime.date.fromisoformat(last_update).day != (datetime.date.today().day - 1)) and datetime.datetime.now(tz=timezone('Europe/Warsaw')).hour > 6):
+        learning_session_from_yesterday = False
+        for user in User.objects.all():
+            if user.now_learning and user.progress.last().start_date.day == datetime.date.today().day - 1:
+               learning_session_from_yesterday = True
+        if ((datetime.date.fromisoformat(last_update).day != (datetime.date.today().day - 1)) and not learning_session_from_yesterday):
             new_entry = new_data(datetime.date.today() - datetime.timedelta(days=1))
             add_daily_summary(new_entry)
 

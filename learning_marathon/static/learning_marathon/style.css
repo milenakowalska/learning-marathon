@@ -6,10 +6,12 @@
 
 #status:hover {
     content: url('start-hover.png');
-    box-shadow: grey;
-} 
+}
 
 #status-learning:hover {
     content: url('end.png');
-    box-shadow: grey;
-} 
+}
+
+#status-learning-other:hover {
+    content: url('stop.png');
+}

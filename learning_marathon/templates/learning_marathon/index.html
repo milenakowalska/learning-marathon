@@ -14,19 +14,27 @@
         {% endif %}
         <form action="{% url 'learning_marathon:index' %}" method="POST">
             {% csrf_token %}
+         {% if user.now_learning and user.udemy %}
         <button type='submit' value='' name='udemy' style='background-color: rgba(255, 255, 255, 0);border-color: rgba(255, 255, 255, 0);'>
-            {% if user.now_learning and user.udemy %}
-            <img id='status-learning' 
+            <img id='status-learning'
                 style="max-width: 100%;width:550px"
-                src="{% static 'learning_marathon/progress.png' %}" 
+                src="{% static 'learning_marathon/progress.png' %}"
                 />
-            {% else %}
-            <img id='status' 
-                style="max-width: 100%;width:550px"
-                src="{% static 'learning_marathon/start.png' %}" 
-                />
-            {% endif %}
         </button>
+        {% elif user.now_learning and not user.udemy %}
+        <img id='status-learning-other'
+                style="max-width: 100%;width:550px"
+                src="{% static 'learning_marathon/stop.png' %}"
+                />
+
+        {% else %}
+        <button type='submit' value='' name='udemy' style='background-color: rgba(255, 255, 255, 0);border-color: rgba(255, 255, 255, 0);'>
+        <img id='status'
+            style="max-width: 100%;width:550px"
+            src="{% static 'learning_marathon/start.png' %}"
+            />
+        </button>
+        {% endif %}
         </form>
     </div>
     <div class='col-lg-6 justify-content-center text-center'>
@@ -38,19 +46,26 @@
         {% endif %}
         <form action="{% url 'learning_marathon:index' %}" method="POST">
             {% csrf_token %}
+        {% if user.now_learning and not user.udemy %}
         <button type='submit' value='' name='non-udemy' style='background-color: rgba(255, 255, 255, 0);border-color: rgba(255, 255, 255, 0);'>
-            {% if user.now_learning and not user.udemy %}
-            <img id='status-learning' 
+            <img id='status-learning'
                 style="max-width: 100%;width:550px"
-                src="{% static 'learning_marathon/progress.png' %}" 
+                src="{% static 'learning_marathon/progress.png' %}"
+                />
+        </button>
+            {% elif user.now_learning and user.udemy %}
+            <img id='status-learning-other'
+                style="max-width: 100%;width:550px"
+                src="{% static 'learning_marathon/stop.png' %}"
                 />
             {% else %}
-            <img id='status' 
+        <button type='submit' value='' name='non-udemy' style='background-color: rgba(255, 255, 255, 0);border-color: rgba(255, 255, 255, 0);'>
+            <img id='status'
                 style="max-width: 100%;width:550px"
-                src="{% static 'learning_marathon/start.png' %}" 
+                src="{% static 'learning_marathon/start.png' %}"
                 />
-            {% endif %}
         </button>
+            {% endif %}
         </form>
     </div>
 </div>
