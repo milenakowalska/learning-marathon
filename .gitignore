@@ -1,3 +1,5 @@
 .DS_Store
 db.sqlite3
 learning_marathon/learning_sessions.json
+db.sqlite3.orig
+Procfile
