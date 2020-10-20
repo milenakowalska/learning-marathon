@@ -20,45 +20,53 @@
             {{ day.day }}
         </div>
         <div class='col-lg-1'>
-            {{ day.user1 }}
+            {{ day.user1.udemy }}
         </div>
         <div class='col-lg-4'>
-            {% for reward in day.user1_rewards|get_range %}
+            {% if day.user1.rewards %}
+            {% for reward in day.user1.rewards|get_range %}
             <i style='height: 20px;font-size: 20px;' class="fas fa-star"></i>
             {% endfor %}
+            {% endif %}
         </div>
         <div class='col-lg-4 text-right'>
-            {% for reward in day.user2_rewards|get_range %}
+            {% if day.user2.rewards %}
+            {% for reward in day.user2.rewards|get_range %}
             <i style='height: 20px;font-size: 20px;' class="fas fa-star"></i>
             {% endfor %}
+            {% endif %}
         </div>
         <div class='col-lg-1 text-right'>
-            {{ day.user2 }}
+            {{ day.user2.udemy }}
         </div>
 
     </div>
-    {% if day.user1_no_udemy != no_learn or day.user2_no_udemy != no_learn %}
+    {% if day.user1.no_udemy != no_learn or day.user2.no_udemy != no_learn %}
     <div class='row align-content-center m-3' style='min-height:50px'>
         <div class='col-lg-2'>
 
         </div>
         <div class='col-lg-1'>
-            {{ day.user1_no_udemy }}
+            {{ day.user1.no_udemy }}
         </div>
         <div class='col-lg-4'>
-            {% for reward in day.user1_no_udemy_rewards|get_range %}
+            {% if day.user1.rewards_no_udemy %}
+            {% for reward in day.user1.rewards_no_udemy|get_range %}
             <i style='height: 20px;font-size: 20px;' class="far fa-star"></i>
             {% endfor %}
+            {% endif %}
         </div>
 
 
         <div class='col-lg-4 text-right'>
-            {% for reward in day.user2_no_udemy_rewards|get_range %}
+            {% if day.user2.rewards.no_udemy %}
+            {% for reward in day.user2.rewards.no_udemy|get_range %}
             <i style='height: 20px;font-size: 20px;' class="far fa-star"></i>
             {% endfor %}
+            {% endif %}
         </div>
         <div class='col-lg-1 text-right'>
-            {{ day.user2_no_udemy }}
+            {{ day.user2.no_udemy }}
         </div>
 
     </div>
@@ -71,10 +79,10 @@
             Summary: <i style='height: 20px;font-size: 30px;' class="fas fa-star"></i>
         </div>
         <div class='col-lg-5'>
-            <p id='name'>{{ user1_summary }}</p>
+            <p id='name'>{{ summary.user1_summary }}</p>
         </div>
         <div class='col-lg-5 text-right'>
-            <p id='name'>{{ user2_summary }}</p>
+            <p id='name'>{{ summary.user2_summary }}</p>
         </div>
     </div>
 
@@ -83,10 +91,10 @@
             No Udemy: <i style='height: 20px;font-size: 30px;' class="far fa-star"></i>
         </div>
         <div class='col-lg-5'>
-            <p id='name'>{{ user1_no_udemy_summary }}</p>
+            <p id='name'>{{ summary.user1_no_udemy_summary }}</p>
         </div>
         <div class='col-lg-5 text-right'>
-            <p id='name'>{{ user2_no_udemy_summary }}</p>
+            <p id='name'>{{ summary.user2_no_udemy_summary }}</p>
         </div>
     </div>
 

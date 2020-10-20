@@ -1,86 +1,71 @@
-import json
 from .models import User, LearningSession
-import datetime
-import os
-import re
-from pytz import timezone
-
+from datetime import datetime, date, timedelta
 
 def day_summary(user, date, udemy: bool):
     entries = LearningSession.objects.filter(user=user, udemy=udemy)
-    day_complete = datetime.timedelta(seconds=0)
+    day_complete = timedelta(seconds=0)
 
     for entry in entries:
         if entry.start_date.day == date.day and entry.start_date.month == date.month and entry.start_date.year == date.year:
             day_complete += entry.duration()
-    summary = day_complete - datetime.timedelta(microseconds=day_complete.microseconds)
+    summary = day_complete - timedelta(microseconds=day_complete.microseconds)
     if summary:
         return summary
     else:
-        return datetime.timedelta(seconds=0)
+        return timedelta(seconds=0)
 
 def new_data(date):
     user1 = User.objects.first()
     user2 = User.objects.last()
 
+    user1_udemy = day_summary(user1, date, True)
+    user1_no_udemy = day_summary(user1, date, False)
+    user2_udemy = day_summary(user2, date, True)
+    user2_no_udemy = day_summary(user2, date, False)
+
     day_entry = {
         'day':date.isoformat(),
-        'user1':str(day_summary(user1, date, True)),
-        'user1_no_udemy':str(day_summary(user1, date, False)),
-        'user2':str(day_summary(user2, date, True)),
-        'user2_no_udemy':str(day_summary(user2, date, False)),
-        'user1_rewards':str(day_summary(user1, date, True).seconds//3600),
-        'user1_no_udemy_rewards':str(day_summary(user1, date, False).seconds//3600),
-        'user2_rewards':str(day_summary(user2, date, True).seconds//3600),
-        'user2_no_udemy_rewards':str(day_summary(user2, date, False).seconds//3600)
+        'user1': {'udemy': user1_udemy,
+                    'no_udemy':user1_no_udemy,
+                    'rewards': user1_udemy.seconds//3600,
+                    'rewards_no_udemy': user1_no_udemy.seconds//3600},
+        'user2': {'udemy': user2_udemy,
+                    'no_udemy':user2_no_udemy,
+                    'rewards': user2_udemy.seconds//3600,
+                    'rewards_no_udemy': user2_no_udemy.seconds//3600}
     }
     return day_entry
 
-def add_daily_summary(new_data):
-    with open (os.path.join(os.path.dirname(__file__),'learning_sessions.json')) as json_file:
-        data = json.load(json_file)
-        learning_sessions = data['learning_sessions']
-        learning_sessions.append(new_data)
-
-    with open (os.path.join(os.path.dirname(__file__),'learning_sessions.json'), 'w') as json_file:
-        json.dump(data, json_file)
-
-
-def update():
-    with open (os.path.join(os.path.dirname(__file__),'learning_sessions.json')) as json_file:
-        data = json.load(json_file)
-        last_update = data['learning_sessions'][-1]['day']
-        learning_session_from_yesterday = False
-        for user in User.objects.all():
-            if user.now_learning and user.progress.last().start_date.day == datetime.date.today().day - 1:
-               learning_session_from_yesterday = True
-        if ((datetime.date.fromisoformat(last_update).day != (datetime.date.today().day - 1)) and not learning_session_from_yesterday):
-            new_entry = new_data(datetime.date.today() - datetime.timedelta(days=1))
-            add_daily_summary(new_entry)
-
 def get_data():
-    with open (os.path.join(os.path.dirname(__file__),'learning_sessions.json')) as json_file:
-        data = json.load(json_file)
-        learning_sessions = data['learning_sessions']
-        for session in learning_sessions:
-            time_user1 = datetime.datetime.strptime(session['user1'],"%H:%M:%S")
-            duration = datetime.timedelta(hours=time_user1.hour, minutes=time_user1.minute, seconds=time_user1.second)
-            session['user1'] = duration
-            session['user1_rewards'] = int(session['user1_rewards'])
+    current_data = []
 
-            time_user1_no_udemy = datetime.datetime.strptime(session['user1_no_udemy'],"%H:%M:%S")
-            duration_no_udemy = datetime.timedelta(hours=time_user1_no_udemy.hour, minutes=time_user1_no_udemy.minute, seconds=time_user1_no_udemy.second)
-            session['user1_no_udemy'] = duration_no_udemy
-            session['user1_no_udemy_rewards'] = int(session['user1_no_udemy_rewards'])
+    user1_summary = timedelta(seconds=0)
+    user2_summary = timedelta(seconds=0)
+    user1_no_udemy_summary = timedelta(seconds=0)
+    user2_no_udemy_summary = timedelta(seconds=0)
 
-            time_user2 = datetime.datetime.strptime(session['user2'],"%H:%M:%S")
-            duration = datetime.timedelta(hours=time_user2.hour, minutes=time_user2.minute, seconds=time_user2.second)
-            session['user2'] = duration
-            session['user2_rewards'] = int(session['user2_rewards'])
+    start_date = date(2020,10,14)
+    end_date = date.today() 
+    time_range = end_date - start_date
+    date_list = [(date.today() + timedelta(days=1)) - timedelta(days=x) for x in range(time_range.days)]
 
-            time_user2_no_udemy = datetime.datetime.strptime(session['user2_no_udemy'],"%H:%M:%S")
-            duration_no_udemy = datetime.timedelta(hours=time_user2_no_udemy.hour, minutes=time_user2_no_udemy.minute, seconds=time_user2_no_udemy.second)
-            session['user2_no_udemy'] = duration_no_udemy
-            session['user2_no_udemy_rewards'] = int(session['user2_no_udemy_rewards'])
+    for day in date_list:
+        day_data = new_data(day)
+        current_data.append(day_data)
+        user1 = day_data['user1']
+        user2 = day_data['user2']
 
-    return learning_sessions
+        user1_summary += user1['udemy']
+        user2_summary += user2['udemy']
+        user1_no_udemy_summary += user1['no_udemy']
+        user2_no_udemy_summary += user2['no_udemy']
+    
+    summary_entry = {
+        'user1_summary' : user1_summary,
+        'user2_summary' : user2_summary,
+        'user1_no_udemy_summary' : user1_no_udemy_summary,
+        'user2_no_udemy_summary' : user2_no_udemy_summary
+    }
+    current_data[0] = summary_entry
+    
+    return current_data

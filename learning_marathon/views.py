@@ -17,6 +17,8 @@ def get_range(value):
 from .models import User, LearningSession
 # Create your views here.
 
+##########################################################################################################################################
+
 def index(request):
     if not request.user.is_authenticated:
         return render(request, 'learning_marathon/login.html')
@@ -53,30 +55,17 @@ def index(request):
 
 @login_required
 def statistics(request):
-    make_statistics.update()
-    data = make_statistics.get_data()
-    data = data[1:]
+    data = make_statistics.get_data()[1:]
+    summary = make_statistics.get_data()[0]
     users = User.objects.all()
-    user1_summary = datetime.timedelta(seconds=0)
-    user2_summary = datetime.timedelta(seconds=0)
-    user1_no_udemy_summary = datetime.timedelta(seconds=0)
-    user2_no_udemy_summary = datetime.timedelta(seconds=0)
-
-    for day in data:
-        user1_summary += day['user1']
-        user2_summary += day['user2']
-        user1_no_udemy_summary += day['user1_no_udemy']
-        user2_no_udemy_summary += day['user2_no_udemy']
-
     no_learn = datetime.timedelta(seconds=0)
 
     return render(request, 'learning_marathon/statistics.html', {'data':data,
                                                                 'users':users,
-                                                                'user1_summary':user1_summary,
-                                                                'user2_summary':user2_summary,
-                                                                'user1_no_udemy_summary':user1_no_udemy_summary,
-                                                                'user2_no_udemy_summary':user2_no_udemy_summary,
+                                                                'summary':summary,
                                                                 'no_learn':no_learn})
+
+##########################################################################################################################################
 
 def login_view(request):
     if request.method == "POST":
