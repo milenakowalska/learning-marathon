@@ -21,7 +21,7 @@ def index(request):
     if not request.user.is_authenticated:
         return render(request, 'learning_marathon/login.html')
     if request.method == 'POST':
- 
+
         if request.user.now_learning:
             current_session = LearningSession.objects.filter(user=request.user).last()
             current_session.end_date = datetime.datetime.now(tz=timezone('Europe/Warsaw'))
@@ -31,11 +31,11 @@ def index(request):
             request.user.save()
         else:
             if 'udemy' in request.POST:
-                current_session = LearningSession.objects.create(user = request.user, udemy = True) 
+                current_session = LearningSession.objects.create(user = request.user, udemy = True)
                 current_session.start_date = datetime.datetime.now(tz=timezone('Europe/Warsaw'))
                 request.user.udemy = True
             else:
-                current_session = LearningSession.objects.create(user = request.user, udemy = False) 
+                current_session = LearningSession.objects.create(user = request.user, udemy = False)
             current_session.save()
             request.user.now_learning = True
             request.user.save()
@@ -68,12 +68,15 @@ def statistics(request):
         user1_no_udemy_summary += day['user1_no_udemy']
         user2_no_udemy_summary += day['user2_no_udemy']
 
-    return render(request, 'learning_marathon/statistics.html', {'data':data, 
-                                                                'users':users, 
-                                                                'user1_summary':user1_summary, 
+    no_learn = datetime.timedelta(seconds=0)
+
+    return render(request, 'learning_marathon/statistics.html', {'data':data,
+                                                                'users':users,
+                                                                'user1_summary':user1_summary,
                                                                 'user2_summary':user2_summary,
-                                                                'user1_no_udemy_summary':user1_no_udemy_summary, 
-                                                                'user2_no_udemy_summary':user2_no_udemy_summary})
+                                                                'user1_no_udemy_summary':user1_no_udemy_summary,
+                                                                'user2_no_udemy_summary':user2_no_udemy_summary,
+                                                                'no_learn':no_learn})
 
 def login_view(request):
     if request.method == "POST":

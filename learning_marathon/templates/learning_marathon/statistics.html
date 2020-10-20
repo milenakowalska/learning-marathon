@@ -37,22 +37,21 @@
         </div>
 
     </div>
-    {% if day.user1_no_udemy > 0 or day.user2_no_udemy > 0 %}
+    {% if day.user1_no_udemy != no_learn or day.user2_no_udemy != no_learn %}
     <div class='row align-content-center m-3' style='min-height:50px'>
         <div class='col-lg-2'>
-            
+
         </div>
-        {% if day.user1_no_udemy > 0 %}
         <div class='col-lg-1'>
-            {{ day.user1_no_udemy }}       
+            {{ day.user1_no_udemy }}
         </div>
         <div class='col-lg-4'>
             {% for reward in day.user1_no_udemy_rewards|get_range %}
             <i style='height: 20px;font-size: 20px;' class="far fa-star"></i>
-            {% endfor %}   
+            {% endfor %}
         </div>
-        {% endif %}
-        {% if day.user2_no_udemy > 0 %}
+
+
         <div class='col-lg-4 text-right'>
             {% for reward in day.user2_no_udemy_rewards|get_range %}
             <i style='height: 20px;font-size: 20px;' class="far fa-star"></i>
@@ -61,7 +60,6 @@
         <div class='col-lg-1 text-right'>
             {{ day.user2_no_udemy }}
         </div>
-        {% endif %}
 
     </div>
     {% endif %}
@@ -88,7 +86,7 @@
             <p id='name'>{{ user1_no_udemy_summary }}</p>
         </div>
         <div class='col-lg-5 text-right'>
-            <p id='name'>{{ user1_no_udemy_summary }}</p>
+            <p id='name'>{{ user2_no_udemy_summary }}</p>
         </div>
     </div>
 
